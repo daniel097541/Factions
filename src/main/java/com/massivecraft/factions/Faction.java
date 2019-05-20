@@ -9,6 +9,7 @@ import com.massivecraft.factions.util.LazyLocation;
 import com.massivecraft.factions.zcore.fperms.Access;
 import com.massivecraft.factions.zcore.fperms.Permissable;
 import com.massivecraft.factions.zcore.fperms.PermissableAction;
+import info.beastsoftware.beastfactions.factions.entity.IFaction;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -17,6 +18,9 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public interface Faction extends EconomyParticipator {
+
+    IFaction getBFFaction();
+
     public HashMap<String, List<String>> getAnnouncements();
 
     public ConcurrentHashMap<String, LazyLocation> getWarps();

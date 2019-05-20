@@ -1,6 +1,6 @@
 package com.massivecraft.factions;
 
-import com.massivecraft.factions.zcore.persist.json.JSONBoard;
+import com.massivecraft.factions.beastfactions.BFFBoard;
 import mkremins.fanciful.FancyMessage;
 import org.bukkit.World;
 
@@ -17,7 +17,7 @@ public abstract class Board {
     public abstract String getIdAt(FLocation flocation);
 
     private static Board getBoardImpl() {
-        return null;
+        return new BFFBoard();
     }
 
     public static Board getInstance() {

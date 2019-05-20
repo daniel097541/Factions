@@ -6,6 +6,7 @@ import com.massivecraft.factions.P;
 import com.massivecraft.factions.zcore.fperms.Permissable;
 import com.massivecraft.factions.zcore.util.TL;
 import com.massivecraft.factions.zcore.util.TagUtil;
+import info.beastsoftware.beastfactions.factions.entity.IRelation;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -45,6 +46,24 @@ public enum Relation implements Permissable {
         } else {
             return NEUTRAL; // If they somehow mess things up, go back to default behavior.
         }
+    }
+
+
+    public static Relation getRelation(IRelation relation){
+
+        if(relation.getName().equalsIgnoreCase("ally"))
+            return ALLY;
+
+        if(relation.getName().equalsIgnoreCase("enemy"))
+            return ENEMY;
+
+        if(relation.getName().equalsIgnoreCase("neutral"))
+            return NEUTRAL;
+
+        if(relation.getName().equalsIgnoreCase("truce"))
+            return TRUCE;
+
+        return null;
     }
 
     @Override

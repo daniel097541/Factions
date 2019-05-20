@@ -63,23 +63,6 @@ public class P extends MPlugin {
 
     @Override
     public void onEnable() {
-//
-//        /// just load factions, players and board
-//        FPlayers.getInstance().load();
-//        Factions.getInstance().load();
-//        for (FPlayer fPlayer : FPlayers.getInstance().getAllFPlayers()) {
-//            Faction faction = Factions.getInstance().getFactionById(fPlayer.getFactionId());
-//            if (faction == null) {
-//                log("Invalid faction id on " + fPlayer.getName() + ":" + fPlayer.getFactionId());
-//                fPlayer.resetFactionData(false);
-//                continue;
-//            }
-//            faction.addFPlayer(fPlayer);
-//        }
-//        Board.getInstance().load();
-//        Board.getInstance().clean();
-
-
         this.loadSuccessful = true;
     }
 

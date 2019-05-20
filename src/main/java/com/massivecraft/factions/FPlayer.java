@@ -7,6 +7,7 @@ import com.massivecraft.factions.struct.ChatMode;
 import com.massivecraft.factions.struct.Relation;
 import com.massivecraft.factions.struct.Role;
 import com.massivecraft.factions.util.WarmUpUtil;
+import info.beastsoftware.beastfactions.factions.entity.IFPlayer;
 import mkremins.fanciful.FancyMessage;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -29,6 +30,9 @@ import java.util.List;
  */
 
 public interface FPlayer extends EconomyParticipator {
+
+    IFPlayer getBFFPlayer();
+
     public void login();
 
     public void logout();

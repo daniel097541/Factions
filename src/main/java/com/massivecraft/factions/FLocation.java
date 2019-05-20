@@ -36,6 +36,10 @@ public class FLocation implements Serializable {
 
     }
 
+    public Location getLocation(){
+        return getChunk().getBlock(0,0,0).getLocation();
+    }
+
     public FLocation(String worldName, int x, int z) {
         this.worldName = worldName;
         this.x = x;

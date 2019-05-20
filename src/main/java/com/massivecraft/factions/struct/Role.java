@@ -6,6 +6,8 @@ import com.massivecraft.factions.P;
 import com.massivecraft.factions.zcore.fperms.Permissable;
 import com.massivecraft.factions.zcore.util.TL;
 import com.massivecraft.factions.zcore.util.TagUtil;
+import info.beastsoftware.beastfactions.BeastFactions;
+import info.beastsoftware.beastfactions.factions.entity.IFactionRole;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -28,10 +30,26 @@ public enum Role implements Permissable {
     public final TL translation;
 
 
+
     Role(final int value, final TL translation) {
         this.value = value;
-        this.nicename = translation.toString();
+        this.nicename = null;//translation.toString();
         this.translation = translation;
+    }
+
+    public static Role getRole(IFactionRole role){
+
+        if(role == null) return null;
+
+        if(role.getRoleName().equalsIgnoreCase("mod"))
+            return MODERATOR;
+        if (role.getRoleName().equalsIgnoreCase("admin") || role.getRoleName().equalsIgnoreCase("leader")){
+            return ADMIN;
+        }
+        if(role.getRoleName().equalsIgnoreCase("member"))
+            return NORMAL;
+
+        return null;
     }
 
     public boolean isAtLeast(Role role) {

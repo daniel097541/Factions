@@ -1,6 +1,6 @@
 package com.massivecraft.factions;
 
-import com.massivecraft.factions.zcore.persist.json.JSONFactions;
+import com.massivecraft.factions.beastfactions.BFFactions;
 
 import java.util.ArrayList;
 import java.util.Set;
@@ -44,7 +44,7 @@ public abstract class Factions {
     }
 
     private static Factions getFactionsImpl() {
-        return null;
+        return new BFFactions();
     }
 
     public abstract void load();

@@ -1,6 +1,6 @@
 package com.massivecraft.factions;
 
-import com.massivecraft.factions.zcore.persist.json.JSONFPlayers;
+import com.massivecraft.factions.beastfactions.BFFPlayers;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
@@ -16,7 +16,7 @@ public abstract class FPlayers {
     }
 
     private static FPlayers getFPlayersImpl() {
-        return null;
+        return new BFFPlayers();
     }
 
     public abstract Collection<FPlayer> getOnlinePlayers();
