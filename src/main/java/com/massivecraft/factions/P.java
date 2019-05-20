@@ -3,13 +3,8 @@ package com.massivecraft.factions;
 import com.earth2me.essentials.IEssentials;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import com.massivecraft.factions.cmd.CmdAutoHelp;
-import com.massivecraft.factions.cmd.FCmdRoot;
-import com.massivecraft.factions.integration.*;
-import com.massivecraft.factions.integration.dynmap.EngineDynmap;
-import com.massivecraft.factions.listeners.*;
-import com.massivecraft.factions.listeners.versionspecific.PortalListenerLegacy;
-import com.massivecraft.factions.listeners.versionspecific.PortalListener_114;
+
+
 import com.massivecraft.factions.struct.ChatMode;
 import com.massivecraft.factions.util.*;
 import com.massivecraft.factions.util.material.FactionMaterial;
@@ -59,19 +54,8 @@ public class P extends MPlugin {
         this.setAutoSave(val);
     }
 
-    private Integer AutoLeaveTask = null;
-
-    // Commands
-    public FCmdRoot cmdBase;
-    public CmdAutoHelp cmdAutoHelp;
-
-    private boolean hookedPlayervaults;
-    private ClipPlaceholderAPIManager clipPlaceholderAPIManager;
-    private boolean mvdwPlaceholderAPIManager = false;
-
     public SeeChunkUtil seeChunkUtil;
     public ParticleProvider particleProvider;
-    public IWorldguard worldguard;
 
     public P() {
         p = this;
@@ -79,31 +63,8 @@ public class P extends MPlugin {
 
     @Override
     public void onEnable() {
-        // Load Material database
-        MaterialDb.load();
-        if (!preEnable()) {
-            return;
-        }
-        this.loadSuccessful = false;
-        saveDefaultConfig();
 
-        // Load Conf from disk
-        Conf.load();
-        P.p.log("Running material provider in %1s mode", MaterialDb.getInstance().legacy ? "LEGACY" : "STANDARD");
-        MaterialDb.getInstance().test();
-
-        // Check for Essentials
-        IEssentials ess = Essentials.setup();
-
-        // We set the option to TRUE by default in the config.yml for new users,
-        // BUT we leave it set to false for users updating that haven't added it to their config.
-        if (ess != null && getConfig().getBoolean("delete-ess-homes", false)) {
-            P.p.log(Level.INFO, "Found Essentials. We'll delete player homes in their old Faction's when kicked.");
-            getServer().getPluginManager().registerEvents(new EssentialsListener(ess), this);
-        }
-
-        hookedPlayervaults = setupPlayervaults();
-
+        /// just load factions, players and board
         FPlayers.getInstance().load();
         Factions.getInstance().load();
         for (FPlayer fPlayer : FPlayers.getInstance().getAllFPlayers()) {
@@ -118,133 +79,10 @@ public class P extends MPlugin {
         Board.getInstance().load();
         Board.getInstance().clean();
 
-        // Add Base Commands
-        this.cmdBase = new FCmdRoot();
-        this.cmdAutoHelp = new CmdAutoHelp();
-        //this.getBaseCommands().add(cmdBase);
 
-        Econ.setup();
-        setupPermissions();
-
-        loadWorldguard();
-
-        EngineDynmap.getInstance().init();
-
-        // start up task which runs the autoLeaveAfterDaysOfInactivity routine
-        startAutoLeaveTask(false);
-
-        // Run before initializing listeners to handle reloads properly.
-        if (!Bukkit.getVersion().contains("1.13") && !Bukkit.getVersion().contains("1.14")) {
-            particleProvider = new PacketParticleProvider();
-        } else {
-            particleProvider = new BukkitParticleProvider();
-        }
-        log(Level.INFO, "Using %1s as a particle provider", particleProvider.name());
-
-        if (P.p.getConfig().getBoolean("see-chunk.particles", true)) {
-            double delay = Math.floor(getConfig().getDouble("f-fly.radius-check", 0.75) * 20);
-            seeChunkUtil = new SeeChunkUtil();
-            seeChunkUtil.runTaskTimer(this, 0, (long) delay);
-        }
-        FactionGUIHandler.start();
-        // End run before registering event handlers.
-
-        // Register Event Handlers
-        getServer().getPluginManager().registerEvents(new FactionsPlayerListener(this), this);
-        getServer().getPluginManager().registerEvents(new FactionsChatListener(this), this);
-        getServer().getPluginManager().registerEvents(new FactionsEntityListener(this), this);
-        getServer().getPluginManager().registerEvents(new FactionsExploitListener(), this);
-        getServer().getPluginManager().registerEvents(new FactionsBlockListener(this), this);
-
-        // Version specific portal listener check.
-        if (Bukkit.getVersion().contains("1.14")) {
-            getServer().getPluginManager().registerEvents(new PortalListener_114(), this);
-            P.p.log(Level.WARNING, "Using 1.14 portal support. This means that we'll block ALL portals from being " +
-                    "created in anything but wilderness.");
-        } else {
-            getServer().getPluginManager().registerEvents(new PortalListenerLegacy(), this);
-        }
-
-        // since some other plugins execute commands directly through this command interface, provide it
-        this.getCommand(refCommand).setExecutor(cmdBase);
-
-        if (getConfig().getBoolean("f-fly.enable", false)) {
-            FlightUtil.start();
-        }
-
-        new TitleAPI();
-        setupPlaceholderAPI();
-        postEnable();
         this.loadSuccessful = true;
     }
 
-    private void loadWorldguard() {
-        if (!Conf.worldGuardChecking && !Conf.worldGuardBuildPriority) {
-            log(Level.INFO, "Not enabling WorldGuard check since no options for it are enabled.");
-            return;
-        }
-
-        Plugin plugin = getServer().getPluginManager().getPlugin("WorldGuard");
-        if (plugin != null) {
-            String version = plugin.getDescription().getVersion();
-            if (version.startsWith("6")) {
-                this.worldguard = new Worldguard6();
-                log(Level.INFO, "Found support for WorldGuard version " + version);
-            } else if (version.startsWith("7")) {
-                this.worldguard = new Worldguard7();
-                log(Level.INFO, "Found support for WorldGuard version " + version);
-            } else {
-                P.p.log(Level.WARNING, "Loaded WorldGuard but couldn't support this version: " + version);
-            }
-        } else {
-            P.p.log(Level.WARNING, "WorldGuard checks were turned in on conf.json, but WorldGuard isn't present on the server.");
-        }
-    }
-
-    public IWorldguard getWorldguard() {
-        return this.worldguard;
-    }
-
-    private void setupPlaceholderAPI() {
-        Plugin clip = getServer().getPluginManager().getPlugin("PlaceholderAPI");
-        if (clip != null && clip.isEnabled()) {
-            this.clipPlaceholderAPIManager = new ClipPlaceholderAPIManager();
-            if (this.clipPlaceholderAPIManager.register()) {
-                log(Level.INFO, "Successfully registered placeholders with PlaceholderAPI.");
-            }
-        }
-
-        Plugin mvdw = getServer().getPluginManager().getPlugin("MVdWPlaceholderAPI");
-        if (mvdw != null && mvdw.isEnabled()) {
-            this.mvdwPlaceholderAPIManager = true;
-            log(Level.INFO, "Found MVdWPlaceholderAPI. Adding hooks.");
-        }
-    }
-
-    public boolean isClipPlaceholderAPIHooked() {
-        return this.clipPlaceholderAPIManager != null;
-    }
-
-    public boolean isMVdWPlaceholderAPIHooked() {
-        return this.mvdwPlaceholderAPIManager;
-    }
-
-    private boolean setupPermissions() {
-        try {
-            RegisteredServiceProvider<Permission> rsp = getServer().getServicesManager().getRegistration(Permission.class);
-            if (rsp != null) {
-                perms = rsp.getProvider();
-            }
-        } catch (NoClassDefFoundError ex) {
-            return false;
-        }
-        return perms != null;
-    }
-
-    private boolean setupPlayervaults() {
-        Plugin plugin = getServer().getPluginManager().getPlugin("PlayerVaults");
-        return plugin != null && plugin.isEnabled();
-    }
 
     @Override
     public GsonBuilder getGsonBuilder() {
@@ -275,41 +113,17 @@ public class P extends MPlugin {
 
     @Override
     public void onDisable() {
-        // only save data if plugin actually completely loaded successfully
-        if (this.loadSuccessful) {
-            Conf.save();
-        }
-        if (AutoLeaveTask != null) {
-            this.getServer().getScheduler().cancelTask(AutoLeaveTask);
-            AutoLeaveTask = null;
-        }
-
         super.onDisable();
     }
 
-    public void startAutoLeaveTask(boolean restartIfRunning) {
-        if (AutoLeaveTask != null) {
-            if (!restartIfRunning) {
-                return;
-            }
-            this.getServer().getScheduler().cancelTask(AutoLeaveTask);
-        }
-
-        if (Conf.autoLeaveRoutineRunsEveryXMinutes > 0.0) {
-            long ticks = (long) (20 * 60 * Conf.autoLeaveRoutineRunsEveryXMinutes);
-            AutoLeaveTask = getServer().getScheduler().scheduleSyncRepeatingTask(this, new AutoLeaveTask(), ticks, ticks);
-        }
-    }
 
     @Override
     public void postAutoSave() {
-        //Board.getInstance().forceSave(); Not sure why this was there as it's called after the board is already saved.
-        Conf.save();
     }
 
     @Override
     public boolean logPlayerCommands() {
-        return Conf.logPlayerCommands;
+        return false;
     }
 
     // -------------------------------------------- //
@@ -433,7 +247,7 @@ public class P extends MPlugin {
     }
 
     public boolean isHookedPlayervaults() {
-        return hookedPlayervaults;
+        return false;
     }
 
     public String getPrimaryGroup(OfflinePlayer player) {

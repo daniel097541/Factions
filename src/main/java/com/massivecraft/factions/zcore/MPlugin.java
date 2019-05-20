@@ -7,14 +7,12 @@ import com.massivecraft.factions.Board;
 import com.massivecraft.factions.Conf;
 import com.massivecraft.factions.FPlayers;
 import com.massivecraft.factions.Factions;
-import com.massivecraft.factions.cmd.FCommand;
 import com.massivecraft.factions.zcore.persist.SaveTask;
 import com.massivecraft.factions.zcore.util.PermUtil;
 import com.massivecraft.factions.zcore.util.Persist;
 import com.massivecraft.factions.zcore.util.TL;
 import com.massivecraft.factions.zcore.util.TextUtil;
 import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -49,8 +47,6 @@ public abstract class MPlugin extends JavaPlugin {
 
     public String refCommand = "";
 
-    // Listeners
-    private MPluginSecretPlayerListener mPluginSecretPlayerListener;
 
     // Our stored base commands
     /*
@@ -94,10 +90,6 @@ public abstract class MPlugin extends JavaPlugin {
             }
         } catch (ClassCastException ex) {
         }
-
-        // Create and register player command listener
-        this.mPluginSecretPlayerListener = new MPluginSecretPlayerListener(this);
-        getServer().getPluginManager().registerEvents(this.mPluginSecretPlayerListener, this);
 
         // Register recurring tasks
         if (saveTask == null && Conf.saveToFileEveryXMinutes > 0.0) {
