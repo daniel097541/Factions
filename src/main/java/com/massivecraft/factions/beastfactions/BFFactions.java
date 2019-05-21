@@ -11,7 +11,12 @@ import java.util.stream.Collectors;
 public class BFFactions extends Factions {
     @Override
     public Faction getFactionById(String id) {
-        return new BFFaction(BeastFactions.getInstance().getExternalAPI().getFaction(Long.parseLong(id)));
+        try {
+            return new BFFaction(BeastFactions.getInstance().getExternalAPI().getFaction(Long.parseLong(id)));
+        }
+        catch (Exception ignored){
+            return null;
+        }
     }
 
     @Override

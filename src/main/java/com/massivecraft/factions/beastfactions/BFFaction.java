@@ -20,6 +20,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -315,7 +316,7 @@ public class BFFaction implements Faction, RelationParticipator {
 
     @Override
     public boolean isNormal() {
-        return false;
+        return !isWilderness() && !isSafeZone() && !isWarZone();
     }
 
     @Override
@@ -522,7 +523,10 @@ public class BFFaction implements Faction, RelationParticipator {
 
     @Override
     public ArrayList<FPlayer> getFPlayersWhereRole(Role role) {
-        return null;
+        return getFPlayersWhereOnline(true)
+                .parallelStream()
+                .filter(p -> p.getRole().equals(role))
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     @Override
@@ -653,5 +657,19 @@ public class BFFaction implements Faction, RelationParticipator {
     @Override
     public void setId(String id) {
 
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        BFFaction faction1 = (BFFaction) o;
+        return Objects.equals(faction, faction1.faction);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(faction);
     }
 }
