@@ -493,6 +493,10 @@ public class BFFaction implements Faction, RelationParticipator {
 
     @Override
     public Set<FPlayer> getFPlayers() {
+
+        if(faction == null || faction.isDefaultFaction())
+            return new HashSet<>();
+
         Set<FPlayer> players =  new HashSet<>();
         for(IFPlayer player : getBFFaction().getFPlayers())
             players.add(new BFFPlayer(player));
