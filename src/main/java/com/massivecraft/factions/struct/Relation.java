@@ -19,11 +19,11 @@ import java.util.List;
 
 
 public enum Relation implements Permissable {
-    MEMBER(4, TL.RELATION_MEMBER_SINGULAR.toString()),
-    ALLY(3, TL.RELATION_ALLY_SINGULAR.toString()),
-    TRUCE(2, TL.RELATION_TRUCE_SINGULAR.toString()),
-    NEUTRAL(1, TL.RELATION_NEUTRAL_SINGULAR.toString()),
-    ENEMY(0, TL.RELATION_ENEMY_SINGULAR.toString());
+    MEMBER(4, "member"),
+    ALLY(3, "ally"),
+    TRUCE(2, "truce"),
+    NEUTRAL(1,"neutral"),
+    ENEMY(0, "enemy");
 
     public final int value;
     public final String nicename;
@@ -51,19 +51,19 @@ public enum Relation implements Permissable {
 
     public static Relation getRelation(IRelation relation){
 
-        if(relation.getName().equalsIgnoreCase("ally"))
+        if(relation.getName().toLowerCase().contains("ally"))
             return ALLY;
 
-        if(relation.getName().equalsIgnoreCase("enemy"))
+        if(relation.getName().toLowerCase().contains("enemy"))
             return ENEMY;
 
-        if(relation.getName().equalsIgnoreCase("neutral"))
+        if(relation.getName().toLowerCase().contains("neutral"))
             return NEUTRAL;
 
-        if(relation.getName().equalsIgnoreCase("truce"))
+        if(relation.getName().toLowerCase().contains("truce"))
             return TRUCE;
 
-        return null;
+        return MEMBER;
     }
 
     @Override
