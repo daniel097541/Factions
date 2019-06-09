@@ -16,6 +16,7 @@ import info.beastsoftware.beastfactions.BeastFactions;
 import info.beastsoftware.beastfactions.factions.entity.IFPlayer;
 import info.beastsoftware.beastfactions.factions.entity.IFaction;
 import info.beastsoftware.beastfactions.factions.entity.IFactionRole;
+import info.beastsoftware.beastfactions.factions.entity.impl.FactionsLocation;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -617,7 +618,7 @@ public class BFFaction implements Faction, RelationParticipator {
 
     @Override
     public boolean isPlayerInOwnerList(FPlayer player, FLocation loc) {
-        return false;
+        return getOwnerList(loc).contains(player.getName());
     }
 
     @Override
@@ -632,12 +633,19 @@ public class BFFaction implements Faction, RelationParticipator {
 
     @Override
     public Set<String> getOwnerList(FLocation loc) {
-        return null;
+
+        return
+                getBFFaction()
+                .getClaimAt(new FactionsLocation(loc.getLocation()))
+                .getOwners()
+                .stream()
+                .map(IFPlayer::getName)
+                .collect(Collectors.toSet());
     }
 
     @Override
     public String getOwnerListString(FLocation loc) {
-        return null;
+        return getOwnerList(loc).toString();
     }
 
     @Override
