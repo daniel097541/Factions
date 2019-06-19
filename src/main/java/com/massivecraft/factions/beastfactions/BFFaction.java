@@ -322,7 +322,7 @@ public class BFFaction implements Faction, RelationParticipator {
 
     @Override
     public boolean isNone() {
-        return false;
+        return isWilderness();
     }
 
     @Override
@@ -508,7 +508,7 @@ public class BFFaction implements Faction, RelationParticipator {
     @Override
     public Set<FPlayer> getFPlayersWhereOnline(boolean online) {
         return getFPlayers()
-                .parallelStream()
+                .stream()
                 .filter(FPlayer::isOnline)
                 .collect(Collectors.toSet());
     }
@@ -516,7 +516,7 @@ public class BFFaction implements Faction, RelationParticipator {
     @Override
     public Set<FPlayer> getFPlayersWhereOnline(boolean online, FPlayer viewer) {
         return getFPlayers()
-                .parallelStream()
+                .stream()
                 .filter(FPlayer::isOnline)
                 .filter(player -> !player.equals(viewer))
                 .collect(Collectors.toSet());    }
@@ -529,7 +529,7 @@ public class BFFaction implements Faction, RelationParticipator {
     @Override
     public ArrayList<FPlayer> getFPlayersWhereRole(Role role) {
         return getFPlayersWhereOnline(true)
-                .parallelStream()
+                .stream()
                 .filter(p -> p.getRole().equals(role))
                 .collect(Collectors.toCollection(ArrayList::new));
     }
@@ -537,7 +537,7 @@ public class BFFaction implements Faction, RelationParticipator {
     @Override
     public ArrayList<Player> getOnlinePlayers() {
         return getFPlayersWhereOnline(true)
-                .parallelStream()
+                .stream()
                 .map(FPlayer::getPlayer).collect(Collectors.toCollection(ArrayList::new));
     }
 
@@ -661,7 +661,7 @@ public class BFFaction implements Faction, RelationParticipator {
     @Override
     public Set<FLocation> getAllClaims() {
         return getBFFaction().getALlClaims()
-                .parallelStream()
+                .stream()
                 .map(claim -> new FLocation(claim.getWorldName(), claim.getX(), claim.getZ()))
                 .collect(Collectors.toSet());
     }
