@@ -618,7 +618,12 @@ public class BFFaction implements Faction, RelationParticipator {
 
     @Override
     public boolean isPlayerInOwnerList(FPlayer player, FLocation loc) {
-        return getOwnerList(loc).contains(player.getName());
+        Set<String> list = getOwnerList(loc);
+
+        if(list == null) return true;
+
+        else
+            return list.contains(player.getName()) || list.contains(player.getPlayer().getUniqueId().toString());
     }
 
     @Override
@@ -634,13 +639,17 @@ public class BFFaction implements Faction, RelationParticipator {
     @Override
     public Set<String> getOwnerList(FLocation loc) {
 
-        return
+        Set<String> list =
                 getBFFaction()
                 .getClaimAt(new FactionsLocation(loc.getLocation()))
                 .getOwners()
                 .stream()
                 .map(IFPlayer::getName)
                 .collect(Collectors.toSet());
+
+        if(list.isEmpty()) return null;
+        else
+            return list;
     }
 
     @Override
